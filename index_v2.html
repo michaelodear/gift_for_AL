@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter the passcode</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+  .card {
+    background: #16213e;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+  }
+  h1 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  p.prompt { color: #aaa; margin-bottom: 1.5rem; }
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 2px solid #333;
+    background: #0f0f23;
+    color: #eee;
+    text-align: center;
+    letter-spacing: 0.15em;
+  }
+  input:focus { outline: none; border-color: #e94560; }
+  button {
+    margin-top: 1rem;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #e94560;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+  }
+  button:hover { background: #d63851; }
+  #result {
+    margin-top: 1.25rem;
+    min-height: 1.5rem;
+    font-size: 1rem;
+    white-space: pre-wrap;
+  }
+  #result.wrong { color: #ff8080; }
+  #result.right { color: #7ee787; }
+  #reveal-video {
+    display: none;
+    width: 100%;
+    margin-top: 1.25rem;
+    border-radius: 8px;
+    max-height: 60vh;
+  }
+  #play-fallback {
+    display: none;
+    margin-top: 0.75rem;
+    background: #333;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="prompt-title">Enter the passcode</h1>
+    <p class="prompt" id="prompt-text">Four digits.</p>
+    <input type="text" id="guess" autocomplete="off" autocapitalize="off" spellcheck="false"
+           placeholder="Enter code..." />
+    <button id="submit-btn" onclick="checkGuess()">Submit</button>
+    <div id="result"></div>
+    <video id="reveal-video" controls playsinline></video>
+    <button id="play-fallback" onclick="document.getElementById('reveal-video').play()">
+      Tap to play
+    </button>
+  </div>
+
+<script>
+const ENTRIES = [{"hash": "87b4d74dba97358a6bbea512d3804442b7e9765e4e4b1ee8811a30ccd4dfabde", "type": "video", "target": "11280523.mp4"}, {"hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", "type": "newtab", "target": "https://app.notion.com/p/Exhibit-B-394fc3fda6d580d28bcafed9ef51f66e"}, {"hash": "f15cea39f11dc0371cfb9a4b7b1c38d5c636feb72d70e2759b0e505905ee9d01", "type": "message", "target": "Getting warmer..."}];
+const WRONG_MESSAGE = "Incorrect. Try again.";
+const NORMALIZE = "upper";
+
+async function sha256Hex(text) {
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function normalize(s) {
+  s = s.trim();
+  if (NORMALIZE === "upper") return s.toUpperCase();
+  if (NORMALIZE === "lower") return s.toLowerCase();
+  return s;
+}
+
+async function checkGuess() {
+  const raw = document.getElementById("guess").value;
+  const normalized = normalize(raw);
+  const hash = await sha256Hex(normalized);
+  const resultEl = document.getElementById("result");
+  const match = ENTRIES.find(e => e.hash === hash);
+
+  if (!match) {
+    resultEl.className = "wrong";
+    resultEl.textContent = WRONG_MESSAGE;
+    return;
+  }
+
+  resultEl.className = "right";
+
+  if (match.type === "video") {
+    resultEl.textContent = "";
+    document.getElementById("guess").style.display = "none";
+    document.getElementById("submit-btn").style.display = "none";
+    const video = document.getElementById("reveal-video");
+    video.src = match.target;
+    video.style.display = "block";
+    video.load();
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        document.getElementById("play-fallback").style.display = "block";
+      });
+    }
+  } else if (match.type === "newtab") {
+    resultEl.textContent = "Correct! (opened in a new tab)";
+    window.open(match.target, "_blank");
+  } else if (match.type === "redirect") {
+    resultEl.textContent = "Correct! Redirecting...";
+    setTimeout(() => { window.location.href = match.target; }, 700);
+  } else {
+    resultEl.textContent = match.target;
+  }
+}
+
+document.getElementById("guess").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") checkGuess();
+});
+</script>
+</body>
+</html>
