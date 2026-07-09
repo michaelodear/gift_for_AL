@@ -15,7 +15,7 @@
    <div class="verdict err" id="msg" style="margin-top:10px"></div>
    <a class="cont" id="say">Say it →</a>
   </div>
-  <div class="note">Go do it in SnapGene, then come back (or Resume from the start page). Your place is saved.</div>
+  <div class="note">Go do it in SnapGene, then come back. <a href="../index.html" style="color:var(--amber)">Save &amp; exit to the trial hub →</a> Your place is saved; bookmark the hub to resume.</div>
  </div>
 </div>
 <script src="act3.js"></script>
@@ -31,7 +31,7 @@ function render(){wrap.innerHTML="";HINTS.forEach(function(h,i){
   var locked=i>=unlocked;var d=document.createElement('div');
   d.className="hint"+(open[i]?" open":"");
   d.innerHTML='<button '+(locked?'disabled':'')+'><span class="chev">▸</span><span>'+(i+1)+' · '+h.q+(locked?' 🔒':'')+'</span></button><div class="text">'+h.a+'</div>';
-  d.querySelector('button').onclick=function(){open[i]=!open[i]; if(open[i]&&i+1>unlocked)unlocked=i+1; render();};
+  d.querySelector('button').onclick=function(){open[i]=!open[i]; if(open[i]&&i+2>unlocked)unlocked=i+2; render();};
   wrap.appendChild(d);});
   document.getElementById('lastword').style.display = unlocked>=HINTS.length || Object.keys(open).length ? 'block':'block';
 }
