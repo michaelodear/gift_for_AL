@@ -1,0 +1,217 @@
+<!--
+  EVIDENCE CONTROL — MIRROR NODE (passcode gate)
+  Self-contained. Host on GitHub Pages, link to it. Sits in FRONT of the Notion locker.
+  Edit CONFIG below: the code, the nonogram link, and where "Open the case file" goes.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>EVIDENCE CONTROL — RESTRICTED</title>
+
+<script>
+/* ————————————————— EDIT THIS ————————————————— */
+const CODE       = "4231";
+const LOCKER_URL = "https://app.notion.com/p/EVIDENCE-LOCKER-CASE-0507-398fc3fda6d580ce83cae8bfcd103ed3";   // Act 2 evidence locker (Notion). Code comes from the physical nonogram; no grid link here.
+/* ——————————————— END EDIT ——————————————— */
+</script>
+
+<style>
+  :root{
+    --void:#080b0f; --panel:#0c1219; --line:#182430;
+    --amber:#e6a532; --amber-dim:#8a6a2c;
+    --dim:#556676; --ink:#c7d2dc;
+    --red:#cf4634; --green:#46bf72;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% 12%, #0e1620 0%, var(--void) 62%),
+      var(--void);
+    color:var(--ink);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    min-height:100%; display:flex; flex-direction:column;
+    overflow:hidden; cursor:default; -webkit-tap-highlight-color:transparent;
+  }
+  /* CRT atmosphere */
+  #crt{position:fixed;inset:0;pointer-events:none;z-index:40;
+    background:repeating-linear-gradient(to bottom, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply;opacity:.55}
+  #vig{position:fixed;inset:0;pointer-events:none;z-index:41;
+    box-shadow:inset 0 0 180px 40px rgba(0,0,0,.75);background:radial-gradient(130% 100% at 50% 40%,transparent 55%,rgba(0,0,0,.5))}
+  @keyframes flick{0%,97%{opacity:1}98%{opacity:.86}99%{opacity:.97}100%{opacity:1}}
+  .stage{animation:flick 6s steps(1) infinite}
+
+  .wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:34px 20px 0;position:relative;z-index:10}
+  .console{width:min(560px,94vw)}
+
+  /* header / seal */
+  .seal{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .seal svg{width:40px;height:40px;flex:none;opacity:.9}
+  .org{letter-spacing:.26em;font-weight:700;font-size:13px;color:var(--ink);
+    font-family:system-ui,"Segoe UI",sans-serif}
+  .org small{display:block;letter-spacing:.34em;font-size:10px;color:var(--dim);font-weight:600;margin-top:4px}
+  .chip{margin-left:auto;display:inline-flex;align-items:center;gap:7px;
+    border:1px solid var(--red);color:var(--red);border-radius:3px;
+    font-size:10px;letter-spacing:.22em;font-weight:700;padding:5px 9px;font-family:system-ui,sans-serif}
+  .chip b{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+  .node{margin:16px 0 4px;font-size:11px;letter-spacing:.18em;color:var(--amber-dim)}
+  .warn{margin:14px 0 26px;font-size:14px;line-height:1.6;color:var(--dim)}
+  .warn b{color:var(--ink);font-weight:400}
+
+  /* code tiles */
+  .prompt{font-size:11px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+  .tiles{display:flex;gap:12px}
+  .tile{flex:1;aspect-ratio:3/4;max-width:74px;border:1px solid var(--line);border-radius:5px;
+    background:linear-gradient(#0a1017,#0c141d);
+    display:flex;align-items:center;justify-content:center;
+    font-size:34px;color:var(--amber);position:relative;
+    text-shadow:0 0 12px rgba(230,165,50,.5);transition:border-color .15s,box-shadow .15s}
+  .tile.on{border-color:var(--amber-dim);box-shadow:inset 0 0 18px rgba(230,165,50,.10)}
+  .tile.active{border-color:var(--amber);box-shadow:0 0 0 1px rgba(230,165,50,.35),inset 0 0 22px rgba(230,165,50,.12)}
+  .tile .car{width:14px;height:2px;background:var(--amber);position:absolute;bottom:14px;animation:blink 1.05s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .tiles.bad .tile{border-color:var(--red);color:var(--red);text-shadow:0 0 12px rgba(207,70,52,.5);animation:shk .34s}
+  .tiles.ok  .tile{border-color:var(--green);color:var(--green);text-shadow:0 0 14px rgba(70,191,114,.6)}
+  @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .row{display:flex;align-items:baseline;justify-content:space-between;margin-top:16px;gap:12px;min-height:20px}
+  .msg{font-size:12.5px;letter-spacing:.02em;color:var(--dim)}
+  .msg.err{color:var(--red)}
+  .msg.ok{color:var(--green)}
+  .grid-link{font-size:11.5px;letter-spacing:.05em;color:var(--amber-dim);text-decoration:none;border-bottom:1px dotted var(--amber-dim);white-space:nowrap}
+  .grid-link:hover{color:var(--amber);border-color:var(--amber)}
+  .grid-link:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+  .open{display:none;margin-top:26px;width:100%;text-align:center;
+    border:1px solid var(--green);color:var(--green);background:rgba(70,191,114,.06);
+    padding:15px;border-radius:5px;text-decoration:none;letter-spacing:.22em;font-size:13px;font-weight:700;
+    font-family:system-ui,sans-serif;text-shadow:0 0 12px rgba(70,191,114,.4)}
+  .open.show{display:block;animation:rise .5s ease both}
+  .open:hover{background:rgba(70,191,114,.13)}
+  .open:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* live access log */
+  .log{z-index:10;border-top:1px solid var(--line);background:rgba(4,7,10,.6);
+    font-size:11px;line-height:1.7;color:var(--dim);padding:10px 16px;height:118px;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:flex-end}
+  .log .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .log .t{color:var(--amber-dim);margin-right:10px}
+  .log .l.warnline{color:#7d8894}
+  .log .l.redline{color:var(--red)}
+  .log .l.okline{color:var(--green)}
+
+  .hidden-input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+
+  @media (prefers-reduced-motion: reduce){
+    .stage,.chip b,.tile .car,.tiles.bad .tile,.open.show{animation:none}
+    #crt{opacity:.3}
+  }
+  @media (max-width:420px){ .tile{font-size:28px} .warn{font-size:13px} }
+</style>
+
+<div id="crt"></div><div id="vig"></div>
+
+<div class="stage" style="flex:1;display:flex;flex-direction:column">
+  <div class="wrap">
+    <div class="console" id="console">
+      <div class="seal">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#c7d2dc" stroke-width="1.3">
+          <circle cx="24" cy="24" r="18"/><ellipse cx="24" cy="24" rx="8" ry="18"/>
+          <path d="M6 24h36M9 15h30M9 33h30"/><path d="M24 3v42" stroke="#e6a532"/>
+          <path d="M24 24l16 8M24 24L8 32" stroke="#e6a532" stroke-width="1"/>
+        </svg>
+        <div class="org">OFFICE OF INTERNATIONAL INVESTIGATION<small>EVIDENCE CONTROL</small></div>
+        <span class="chip"><b></b>RESTRICTED</span>
+      </div>
+
+      <div class="node" id="node">MIRROR NODE 07 · UNAUTHORISED SESSION</div>
+      <p class="warn" id="warn"><b>This terminal is not yours.</b> Everything past this point is logged.</p>
+
+      <div class="prompt" id="prompt">Enter access code</div>
+      <div class="tiles" id="tiles" tabindex="0" role="group" aria-label="Four digit access code">
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+      </div>
+
+      <div class="row">
+        <span class="msg" id="msg"></span>
+      </div>
+
+      <a class="open" id="open" href="#">Open the case file →</a>
+      <input class="hidden-input" id="hi" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" aria-hidden="true">
+    </div>
+  </div>
+
+  <div class="log" id="log" aria-hidden="true"></div>
+</div>
+
+<script>
+  const $=id=>document.getElementById(id);
+  const tilesEl=$("tiles"), tileNodes=[...tilesEl.children], hi=$("hi"),
+        msg=$("msg"), openEl=$("open"), logEl=$("log");
+  openEl.href = LOCKER_URL; openEl.target="_top"; openEl.rel="noopener";
+
+  let solved=false, attempts=0;
+  const now=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());};
+
+  function logLine(text, cls=""){
+    const l=document.createElement("div"); l.className="l "+cls;
+    l.innerHTML='<span class="t">'+now()+'</span>'+text;
+    logEl.appendChild(l);
+    while(logEl.children.length>7) logEl.removeChild(logEl.firstChild);
+  }
+  // seed
+  ["session opened · node MIRROR-07","origin \u00b7\u00b7\u00b7\u00b7\u00b7\u00b7 [MASKED]",
+   "mirror delta: 3 new entries","keystroke capture: ACTIVE"].forEach((t,i)=>setTimeout(()=>logLine(t),260*i));
+  // ambient menace
+  const ambient=["packet sync ok","this terminal is not registered to you","clearance \u2026 PENDING",
+    "mirror delta: 1 new entry","idle \u2014 still watching","re-keying channel","holding"];
+  let amb=0;
+  const ambTimer=setInterval(()=>{ if(solved) return; logLine(ambient[amb++%ambient.length],"warnline"); },3600);
+
+  function render(){
+    const v=hi.value.replace(/\D/g,'').slice(0,4); if(v!==hi.value) hi.value=v;
+    tileNodes.forEach((t,i)=>{
+      t.textContent=v[i]||"";
+      t.classList.toggle("on", i<v.length);
+      const active = i===v.length && !solved && document.activeElement===hi;
+      t.classList.toggle("active", active);
+      t.querySelector(".car")?.remove();
+      if(active){ const c=document.createElement("span"); c.className="car"; t.appendChild(c); }
+    });
+    if(v.length===4 && !solved) check(v);
+  }
+
+  function check(v){
+    if(v===CODE){
+      solved=true; clearInterval(ambTimer);
+      tilesEl.classList.add("ok");
+      $("node").textContent="MIRROR NODE 07 · SESSION AUTHENTICATED";
+      $("prompt").style.display="none";
+      $("warn").innerHTML="<b>Authenticated.</b> The mirror is live \u2014 you\u2019re seeing what they see.";
+      msg.textContent="Access granted."; msg.className="msg ok";
+      logLine("code accepted","okline");
+      logLine("identity: THE GROCER \u00b7 AUTHENTICATED","okline");
+      setTimeout(()=>logLine("mirror sync \u2014 LIVE","okline"),500);
+      openEl.classList.add("show"); openEl.focus();
+      hi.blur();
+    } else {
+      attempts++;
+      tilesEl.classList.add("bad");
+      msg.textContent="Rejected. Attempt logged. Try the grid again."; msg.className="msg err";
+      logLine("code rejected \u00b7 attempt "+attempts+" logged","redline");
+      setTimeout(()=>{ tilesEl.classList.remove("bad"); hi.value=""; render(); msg.textContent=""; msg.className="msg"; }, 620);
+    }
+  }
+
+  hi.addEventListener("input", render);
+  hi.addEventListener("focus", render);
+  hi.addEventListener("blur", render);
+  $("console").addEventListener("click", e=>{ if(e.target.closest("a")) return; if(!solved) hi.focus(); });
+  tilesEl.addEventListener("keydown", ()=>{ if(!solved) hi.focus(); });
+  // autofocus on load (desktop)
+  setTimeout(()=>{ if(!solved) hi.focus(); }, 400);
+  render();
+</script>
