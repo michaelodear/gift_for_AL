@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 0507 — The Trial</title><link rel="stylesheet" href="act3.css"></head><body>
+<div class="frame">
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Act 3 — the courtroom</header>
+  <div class="stage">
+    <h1>The trial of Anthea Lee</h1>
+    <p class="sub">Seven murders, seven countries, one takeaway container. Watch each scene, examine the evidence
+      in your own tools, and clear your name. The DNA work happens in SnapGene — you can step out to analyse
+      the traces and come back; your place is saved.</p>
+    <a class="cont" href="narration.html" id="start">Begin →</a>
+    <a class="cont ghost" href="#" id="resume" style="display:none">Resume where you left off →</a>
+    <div class="note">If you close the tab mid-analysis, just reopen this page and hit Resume.</div>
+  </div>
+</div>
+<script src="act3.js"></script>
+<script>
+var s=Act3.saved();
+if(s&&s.page&&s.page!=='narration.html'){
+  var r=document.getElementById('resume');r.href=s.page;r.style.display='inline-block';
+  document.getElementById('start').classList.add('ghost');
+  document.getElementById('start').textContent='Start over';
+  document.getElementById('start').onclick=function(){Act3.reset();};
+}
+</script></body></html>

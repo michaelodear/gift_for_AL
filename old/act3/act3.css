@@ -1,0 +1,78 @@
+:root{
+  --cream:#f0e6d2; --wood:#8b6f47; --gold:#c9962c; --brick:#a13d2b;
+  --manila:#e7d3a3; --manila-hi:#efe0bb; --ink:#3a2c1c; --dim:#6b5638;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:"Iowan Old Style",Georgia,"Times New Roman",serif;
+  background:radial-gradient(120% 120% at 50% 0%,#f3ead6 0%,#e7d8ba 70%,#dcc8a2 100%);
+  color:var(--ink); min-height:100vh; padding:24px;
+  display:flex; align-items:flex-start; justify-content:center;
+}
+.frame{
+  width:min(820px,100%); background:var(--cream);
+  border:3px solid var(--wood); border-radius:10px;
+  box-shadow:0 18px 44px rgba(60,40,20,.32), inset 0 0 0 2px rgba(201,150,44,.25);
+  overflow:hidden;
+}
+header.tab{
+  background:var(--wood); color:var(--cream);
+  padding:14px 22px; display:flex; align-items:center; gap:12px;
+  border-bottom:3px solid var(--gold);
+  letter-spacing:.14em; text-transform:uppercase; font-size:13px;
+}
+header.tab .dot{width:11px;height:11px;border-radius:50%;
+  background:var(--brick);box-shadow:0 0 0 3px rgba(201,150,44,.5)}
+.stage{padding:24px}
+h1{margin:0 0 6px; font-size:26px; letter-spacing:.02em; color:var(--brick)}
+.sub{margin:0 0 20px; font-size:15px; line-height:1.55; color:var(--dim)}
+p{line-height:1.6}
+.cont{
+  display:inline-block; margin-top:22px; text-decoration:none;
+  color:var(--cream); background:var(--brick); border:2px solid #7c2c1e;
+  padding:12px 24px; border-radius:6px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; font-size:14px; font-family:inherit; cursor:pointer;
+}
+.cont:hover{filter:brightness(1.08)}
+.cont.ghost{background:transparent;color:var(--ink);border-color:var(--wood)}
+.cont:disabled,.cont[aria-disabled=true]{opacity:.4;pointer-events:none}
+.note{font-size:13px;color:var(--dim);margin-top:16px;line-height:1.5;
+  border-left:3px solid var(--gold);padding:6px 0 6px 12px;background:rgba(201,150,44,.08)}
+.warn{border-left-color:var(--brick);background:rgba(161,61,43,.08)}
+/* choices */
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.choice{font-family:inherit;font-size:15px;text-align:left;cursor:pointer;
+  background:linear-gradient(180deg,var(--manila-hi),var(--manila));
+  border:2px solid var(--wood);border-radius:8px;padding:13px 16px;color:var(--ink);
+  transition:transform .1s ease}
+.choice:hover{transform:translateX(3px)}
+.choice.wrong{border-color:var(--brick);animation:shk .35s}
+.choice.right{border-color:#2e7d32;background:#dcecd0}
+@keyframes shk{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.verdict{margin-top:14px;font-size:14px;min-height:20px}
+.verdict.err{color:var(--brick)} .verdict.ok{color:#2e7d32;font-weight:700}
+/* dossier folders */
+.wall{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin:6px 0 8px}
+.folder{position:relative;text-align:center;
+  background:linear-gradient(180deg,var(--manila-hi),var(--manila));
+  border:2px solid var(--wood);border-radius:8px;padding:32px 12px 16px;box-shadow:0 4px 0 #b89a63}
+.folder::before{content:"";position:absolute;top:-11px;left:16px;width:64px;height:14px;
+  background:var(--gold);border:2px solid var(--wood);border-bottom:none;border-radius:6px 6px 0 0}
+.folder .icon{width:60px;height:60px;margin:0 auto 10px;border-radius:50%;
+  background:var(--cream);border:2px solid var(--wood);display:flex;align-items:center;
+  justify-content:center;font-size:30px;overflow:hidden}
+.folder .icon img{width:100%;height:100%;object-fit:cover}
+.folder .name{font-weight:700;font-size:16px}
+.folder .role{font-size:12px;color:var(--wood);margin:2px 0 10px;letter-spacing:.03em}
+.dl{display:inline-block;font-size:12.5px;text-decoration:none;color:var(--cream);
+  background:var(--wood);border-radius:5px;padding:6px 12px;letter-spacing:.04em}
+.dl:hover{background:#755c39}
+/* hint notebook */
+.hint{border:2px solid var(--wood);border-radius:8px;margin-top:10px;overflow:hidden;background:var(--manila)}
+.hint button{width:100%;text-align:left;font-family:inherit;font-size:15px;font-weight:700;
+  background:var(--manila-hi);border:none;padding:12px 14px;cursor:pointer;color:var(--ink);
+  display:flex;gap:8px;align-items:center}
+.hint .text{display:none;padding:0 14px 14px;font-size:14.5px;line-height:1.55;color:var(--dim)}
+.hint.open .text{display:block}
+.hint .chev{transition:transform .15s} .hint.open .chev{transform:rotate(90deg)}

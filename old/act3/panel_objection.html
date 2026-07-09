@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examine the Evidence</title><link rel="stylesheet" href="act3.css"></head><body>
+<div class="frame">
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Recess — examine the evidence</header>
+  <div class="stage">
+    <h1>One clean profile</h1>
+    <p class="sub">You've opened the container's DNA read in SnapGene. The prosecution's whole case rests on it.
+      Look at it again — really look. <b>What's wrong with this trace?</b></p>
+    <div class="choices" id="choices"></div>
+    <div class="verdict" id="verdict"></div>
+    <a class="cont" id="next" href="clip2.html" style="display:none">Raise the objection →</a>
+  </div>
+</div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('panel_objection.html');
+/* ---- EDIT: the choices. correct:true on the real answer. ---- */
+const CHOICES=[
+  {t:"It's clean through the middle of the read.", ok:false, no:"Not quite — the middle of a real read is usually its best part."},
+  {t:"The peak heights rise and fall across the read.", ok:false, no:"Not quite — that's normal. Real peaks breathe."},
+  {t:"It's clean right to both edges.", ok:true},
+  {t:"There's faint baseline noise between the peaks.", ok:false, no:"Not quite — a little baseline noise is what you'd expect."}
+];
+const box=document.getElementById('choices'),v=document.getElementById('verdict'),next=document.getElementById('next');
+CHOICES.forEach(c=>{
+  const b=document.createElement('button');b.className='choice';b.textContent=c.t;
+  b.onclick=()=>{
+    if(c.ok){b.classList.add('right');v.className='verdict ok';
+      v.textContent="Exactly. A real read is a mess at both ends — this one is flawless corner to corner. Nobody recovered this. Somebody built it.";
+      next.style.display='inline-block';[...box.children].forEach(x=>x.disabled=true);}
+    else{b.classList.add('wrong');v.className='verdict err';v.textContent=c.no;
+      setTimeout(()=>b.classList.remove('wrong'),400);}
+  };
+  box.appendChild(b);
+});
+</script></body></html>

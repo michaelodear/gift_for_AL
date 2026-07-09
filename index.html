@@ -1,7 +1,24 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url=./act2/case-map-live-3.html">
-  </head>
-  <body></body>
-</html>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 0507 — The Trial</title><link rel="stylesheet" href="act3/act3.css"></head><body>
+<div class="frame">
+ <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Act 3 — the courtroom</header>
+ <div class="stage">
+  <h1>The trial of Anthea Lee</h1>
+  <p class="sub">Seven murders, seven countries, one takeaway container. Watch each scene, examine the evidence in your own tools, and clear your name. The DNA work happens in SnapGene — step out to analyse the traces whenever you like; your place is saved.</p>
+  <a class="cont" id="begin" href="act3/clip1.html">Begin →</a>
+  <a class="cont ghost" id="resume" style="display:none">Resume where you left off →</a>
+  <div class="note">Stepped out to analyse the DNA? Reopen this page and hit Resume.</div>
+ </div>
+</div>
+<script src="act3/act3.js"></script>
+<script>
+var s=Act3.saved(), ORDER=Act3.order, courtStart=ORDER.indexOf('clip1.html');
+if(s && s.page && ORDER.indexOf(s.page)>=courtStart){
+  var r=document.getElementById('resume'); r.href='act3/'+s.page; r.style.display='inline-block';
+  var b=document.getElementById('begin'); b.textContent='Start over'; b.classList.add('ghost');
+  b.onclick=function(){Act3.reset();};
+} else {
+  location.replace('act3/clip1.html');   // fresh (just came from narration) -> straight in
+}
+</script></body></html>

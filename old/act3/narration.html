@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case 0507 — Tokyo</title>
+<script>
+/* ============================ EDIT HERE ============================ *
+ * Assets are local files in this folder: airport.jpg, detention_center.jpg,
+ * stand.gif, and (optional) a music file — set CONFIG.music to its name.  */
+const CONFIG = {
+  next:  "clip1.html",
+  music: "",                 // e.g. "narration.mp3" — drop the file in this folder. "" = silent.
+  typewriter: true,
+  pages: [
+    { bg:"airport.jpg", name:"",
+      text:"The only unstruck city on the list was Fuji apple. So you flew to Tokyo to get ahead of the Grocer.\n\nYou didn't stop anything. They were waiting for you." },
+    { bg:"airport.jpg", name:"",
+      text:"Customs, 14:07. Four officers by 14:09. A bad photo of your face \u2014 and a very good warrant behind it.\n\nSeven counts. One DNA match. Your name." },
+    { bg:"airport.jpg", name:"",
+      text:"You came to catch a killer.\n\nSomeone made sure you'd be standing exactly here when the net closed.",
+      fadeAfter:true },
+    { bg:"detention_center.jpg", name:"",
+      text:"A holding cell, somewhere under Tokyo. Cold light, colder coffee. Then the door opens." },
+    { bg:"detention_center.jpg", name:"Phoenix Wright", char:"stand.gif", charFadeIn:true,
+      text:"Wright. Phoenix Wright.\n\nI've read your file \u2014 all seven counts. It's the thinnest case I've ever seen." },
+    { bg:"detention_center.jpg", name:"Phoenix Wright", char:"stand.gif",
+      text:"Thin doesn't mean safe, though. One match, and a lot of confidence. Let's go take a proper look at it.",
+      end:true }
+  ]
+};
+</script>
+<style>
+:root{ --boxH: clamp(150px, 24vh, 224px); --gold:#e8c15a; }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;
+  font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:#fff;
+  -webkit-user-select:none;user-select:none;cursor:pointer}
+/* stage fills the screen; the textbox overlays its lower edge so the character
+   stands IN the scene (legs behind the box) instead of floating above it. */
+#bg{position:fixed;inset:0;background-size:cover;background-position:center;transition:opacity .5s ease}
+#char{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  height:100%;max-width:94vw;width:auto;object-fit:contain;object-position:bottom center;
+  opacity:0;transition:opacity .6s ease;pointer-events:none}
+#char.show{opacity:1}
+#curtain{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;
+  transition:opacity .55s ease;z-index:50}
+#curtain.on{opacity:1}
+#box{position:fixed;left:0;right:0;bottom:0;height:var(--boxH);z-index:10;
+  background:linear-gradient(180deg,#14213a 0%,#0b1226 100%);
+  border-top:3px solid var(--gold);box-shadow:0 -12px 34px rgba(0,0,0,.6);padding:22px 26px 18px}
+#name{position:absolute;top:-19px;left:26px;background:var(--gold);color:#141a2e;
+  font-weight:800;padding:5px 16px;border-radius:6px 6px 0 0;font-size:15px;box-shadow:0 -2px 8px rgba(0,0,0,.3)}
+#name:empty{display:none}
+#text{font-size:clamp(16px,2.2vw,21px);line-height:1.5;white-space:pre-line;
+  max-height:calc(var(--boxH) - 56px);overflow:auto}
+#hint{position:absolute;right:22px;bottom:12px;color:var(--gold);font-size:22px;animation:bob 1s infinite}
+@keyframes bob{50%{transform:translateY(4px)}}
+#proceed{position:absolute;right:22px;bottom:14px;display:none;background:#a13d2b;color:#fff;
+  border:2px solid #7c2c1e;border-radius:6px;padding:10px 20px;font:inherit;font-weight:700;
+  letter-spacing:.04em;cursor:pointer;text-transform:uppercase;font-size:14px;text-decoration:none}
+#proceed.show{display:inline-block}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head>
+<body>
+<div id="bg"></div>
+<img id="char" alt="">
+<div id="curtain"></div>
+<div id="box">
+  <div id="name"></div>
+  <div id="text"></div>
+  <div id="hint">▼</div>
+  <a id="proceed" href="#">Proceed to courtroom →</a>
+</div>
+<audio id="bgm" loop></audio>
+<script src="act3.js"></script>
+<script>
+if(window.Act3) Act3.mark('narration.html');
+const P=CONFIG.pages, bg=document.getElementById('bg'), ch=document.getElementById('char'),
+  nm=document.getElementById('name'), tx=document.getElementById('text'),
+  hint=document.getElementById('hint'), proceed=document.getElementById('proceed'),
+  curtain=document.getElementById('curtain'), bgm=document.getElementById('bgm');
+proceed.href=CONFIG.next;
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let i=-1, typing=false, timer=null, fullText="", actx=null;
+
+function initAudio(){ if(actx) return; try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  if(actx&&CONFIG.music){ bgm.src=CONFIG.music; bgm.volume=0.5; bgm.play().catch(()=>{}); } }
+function blip(){ if(!actx) return; const o=actx.createOscillator(), g=actx.createGain();
+  o.type="square"; o.frequency.value=320+Math.random()*50;
+  g.gain.setValueAtTime(0.05, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime+0.03);
+  o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+0.035); }
+function paint(p){
+  bg.style.backgroundImage=`url("${p.bg}")`;
+  nm.textContent=p.name||"";
+  if(p.char){ ch.src=p.char;
+    if(p.charFadeIn){ ch.classList.remove('show'); requestAnimationFrame(()=>requestAnimationFrame(()=>ch.classList.add('show'))); }
+    else ch.classList.add('show'); }
+  else ch.classList.remove('show');
+}
+function typeOut(t){ fullText=t; tx.textContent=""; hint.style.display="none";
+  if(!CONFIG.typewriter||reduce){ tx.textContent=t; done(); return; }
+  typing=true; let k=0; clearInterval(timer);
+  timer=setInterval(()=>{ tx.textContent=t.slice(0,++k); if(k%6===0 && t[k-1]!==" ") blip();
+    if(k>=t.length){ clearInterval(timer); done(); } }, 18); }
+function done(){ typing=false; hint.style.display=P[i].end?"none":"block"; if(P[i].end) proceed.classList.add('show'); }
+function advance(){ i++; if(i>=P.length){ i=P.length-1; return; } paint(P[i]); typeOut(P[i].text); }
+function go(){ const prev=P[i];
+  if(prev&&prev.fadeAfter){ curtain.classList.add('on');
+    setTimeout(()=>{ advance(); setTimeout(()=>curtain.classList.remove('on'),40); }, reduce?0:560); }
+  else advance(); }
+function tap(){ initAudio(); if(P[i]&&P[i].end) return;
+  if(typing){ clearInterval(timer); tx.textContent=fullText; done(); return; } go(); }
+document.body.addEventListener('click', e=>{ if(e.target===proceed) return; tap(); });
+document.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); tap(); } });
+proceed.addEventListener('click', ()=>{ if(window.Act3) Act3.mark(CONFIG.next); });
+advance();
+</script></body></html>

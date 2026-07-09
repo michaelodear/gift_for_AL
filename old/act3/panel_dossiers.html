@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspect Dossiers</title><link rel="stylesheet" href="act3.css"></head><body>
+<div class="frame">
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Who built the forgery?</header>
+  <div class="stage">
+    <h1>Three people, one forged read</h1>
+    <p class="sub">If the trace was <i>built</i>, it was built from a real profile. Here are the three with any
+      reason to want you framed. Download each read, open it over the <b>forged evidence trace</b> in SnapGene,
+      and see whose profile is hiding underneath. You're not convicting anyone yet — just looking for the thread that looks back.</p>
+
+    <div class="wall" id="wall"></div>
+
+    <p style="margin:6px 0 0"><a class="dl" href="evidence_trace.ab1" download>⬇ evidence_trace.ab1 (the forgery)</a>
+      &nbsp; <a class="dl" href="reference.fasta" download>⬇ reference.fasta</a></p>
+
+    <div class="note">Take your time. Do the alignment in SnapGene, then come back to this page (or reopen
+      <b>index.html</b> and pick <b>Resume</b>) — your place is saved. Only one of the three will line up cleanly.</div>
+    <div class="note warn">⚠ Placeholder traces wired for download so the flow is clickable. The real <code>.ab1</code>
+      rework — forgery reads as Anthea, surgeon no-align, seek.com gappy, only Xanthea a near-match — comes with your generator scripts.</div>
+
+    <a class="cont" href="reveal1b.html">I've aligned them →</a>
+  </div>
+</div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('panel_dossiers.html');
+const SUSPECTS=[
+  {name:"seek.com", role:"The Literal Devil", icon:"😈", ab1:"seek_com.ab1"},
+  {name:"The Surgeon", role:"The Unethical Human", icon:"👻", ab1:"the_surgeon.ab1"},
+  {name:"Xanthea Yee", role:"The Doppelgänger", icon:"🙂", ab1:"xanthea_yee.ab1"}
+];
+const wall=document.getElementById('wall');
+SUSPECTS.forEach(s=>{
+  const d=document.createElement('div');d.className='folder';
+  d.innerHTML=`<div class="icon">${s.icon}</div><div class="name">${s.name}</div>
+    <div class="role">${s.role}</div><a class="dl" href="${s.ab1}" download>⬇ ${s.ab1}</a>`;
+  wall.appendChild(d);
+});
+</script></body></html>

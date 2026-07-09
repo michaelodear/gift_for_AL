@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who Do You Accuse?</title><link rel="stylesheet" href="act3.css">
+<style>
+.veil{position:fixed;inset:0;background:rgba(36,24,12,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.veil.show{display:flex}
+.confirm{background:var(--cream);border:3px solid var(--wood);border-radius:10px;max-width:380px;width:100%;padding:26px 24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.confirm .who{font-size:22px;font-weight:700;color:var(--brick);margin:6px 0 4px}
+.confirm p{font-size:14px;margin:0 0 20px}
+.btnrow{display:flex;gap:10px;justify-content:center}
+.stamp{font-size:28px;font-weight:800;letter-spacing:.1em;color:var(--brick);border:5px solid var(--brick);border-radius:8px;padding:6px 14px;display:inline-block;transform:rotate(-9deg);opacity:0;margin-bottom:8px}
+.stamp.hit{animation:st .5s forwards}
+@keyframes st{0%{opacity:0;transform:rotate(-9deg) scale(2.4)}60%{opacity:1;transform:rotate(-9deg) scale(.92)}100%{opacity:1;transform:rotate(-9deg) scale(1)}}
+.folder{cursor:pointer;transition:transform .12s,box-shadow .12s}
+.folder:hover{transform:translateY(-4px);box-shadow:0 10px 0 #b89a63,0 16px 26px rgba(60,40,20,.25)}
+.folder:focus-visible{outline:3px solid var(--brick);outline-offset:3px}
+</style></head><body>
+<div class="frame">
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Name the Grocer</header>
+  <div class="stage">
+    <h1>Who do you accuse?</h1>
+    <p class="sub">The confession is in your hand. Point to the guilty party — but be certain.
+      In this courtroom you only get one objection.</p>
+    <div class="wall" id="wall"></div>
+    <div class="verdict err" id="msg"></div>
+  </div>
+</div>
+<div class="veil" id="veil"><div class="confirm">
+  <div class="stamp" id="stamp">ACCUSED</div>
+  <div>You are about to accuse…</div><div class="who" id="who">—</div>
+  <p>There's no taking this back. Are you sure?</p>
+  <div class="btnrow"><button class="cont ghost" id="back">Reconsider</button><button class="cont" id="go">Objection!</button></div>
+</div></div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('accuse.html');
+/* icon: emoji or an image file you drop in the folder. guilty:true on the real culprit. */
+const SUSPECTS=[
+  {name:"seek.com", role:"The Literal Devil", icon:"😈", guilty:false, no:"Tempting. But a job board can't hold a pipette, however much it deserves the dock."},
+  {name:"The Surgeon", role:"The Unethical Human", icon:"👻", guilty:false, no:"A ghost with a grudge — but the sequence doesn't bear their hand."},
+  {name:"Xanthea Yee", role:"The Doppelgänger", icon:"xanthea_yee.png", iconImg:true, guilty:true}
+];
+const NEXT="reveal2.html";
+const wall=document.getElementById('wall'),veil=document.getElementById('veil'),
+      who=document.getElementById('who'),stamp=document.getElementById('stamp'),msg=document.getElementById('msg');
+let pending=null;
+SUSPECTS.forEach((s,i)=>{
+  const d=document.createElement('div');d.className='folder';d.tabIndex=0;d.setAttribute('role','button');
+  const ic=s.iconImg?`<img src="${s.icon}" alt="">`:s.icon;
+  d.innerHTML=`<div class="icon">${ic}</div><div class="name">${s.name}</div><div class="role">${s.role}</div>`;
+  const open=()=>{pending=i;who.textContent=s.name;stamp.classList.remove('hit');veil.classList.add('show');document.getElementById('go').focus();};
+  d.onclick=open;d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+  wall.appendChild(d);
+});
+document.getElementById('back').onclick=()=>{veil.classList.remove('show');pending=null;};
+veil.onclick=e=>{if(e.target===veil){veil.classList.remove('show');pending=null;}};
+document.getElementById('go').onclick=()=>{
+  if(pending===null)return;const s=SUSPECTS[pending];
+  if(s.guilty){stamp.classList.add('hit');setTimeout(()=>location.href=NEXT,650);}
+  else{veil.classList.remove('show');msg.textContent=s.no;pending=null;}
+};
+</script></body></html>

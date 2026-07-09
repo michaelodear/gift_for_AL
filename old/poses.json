@@ -1,0 +1,52 @@
+{
+  "Phoenix Wright": {
+    "id": 1,
+    "poses": {
+      "Stand": 1,
+      "Desk Slam": 2,
+      "Point": 3,
+      "Confident": 4,
+      "Thinking": 33,
+      "Cornered": 34,
+      "Silly": 35,
+      "Read": 59,
+      "Sip Mug": 76,
+      "Nod": 100,
+      "Headshake": 101,
+      "Damage": 129,
+      "Breakdown": 140,
+      "Coffee Stained": 188,
+      "Yell": 271,
+      "Hair Stained": 358,
+      "Super Objection": 519
+    }
+  },
+  "Miles Edgeworth": {
+    "id": 2,
+    "poses": {
+      "Stand": 5,
+      "Desk Slam": 6,
+      "Point": 7,
+      "Arms Crossed": 8,
+      "Confident Shrug": 9,
+      "Cornered": 36,
+      "Confident Smirk": 47,
+      "Smirk": 185,
+      "Read": 89,
+      "Damage": 90,
+      "Bow": 189,
+      "Yell": 272
+    }
+  },
+  "The Judge": {
+    "id": 10,
+    "poses": {
+      "Stand": 30,
+      "Negative": 31,
+      "Surprised": 32,
+      "Positive": 44,
+      "Eyes Closed": 186,
+      "Headshake": 604
+    }
+  }
+}

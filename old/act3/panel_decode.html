@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Was She Hiding?</title><link rel="stylesheet" href="act3.css"></head><body>
+<div class="frame">
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Read it again</header>
+  <div class="stage">
+    <h1>What was she hiding?</h1>
+    <p class="sub">A near-match points a finger — it doesn't sign a confession. Xanthea's read matched the forgery
+      almost perfectly. Almost. Stop asking what she <i>changed</i> to frame you, and ask what she left in.
+      Make <b>her</b> trace the reference and read it on its own terms.</p>
+
+    <p style="margin:0 0 4px"><a class="dl" href="xanthea_yee.ab1" download>⬇ xanthea_yee.ab1</a></p>
+
+    <p style="margin-top:18px;font-weight:700;color:var(--brick)">Detective's Notebook</p>
+    <div id="hints"></div>
+
+    <div class="note">Same as before — go do it in SnapGene, come back or <b>Resume</b> from index.html when you're ready.</div>
+    <a class="cont" href="accuse.html">I've read the confession →</a>
+  </div>
+</div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('panel_decode.html');
+/* progressive: later tiers unlock only once earlier ones are opened */
+const HINTS=[
+  {label:"1 · Where do I start?", text:"Set Xanthea's trace as the reference and translate it. There's more in this sequence than base calls — read it as protein."},
+  {label:"2 · I'm not seeing anything.", text:"A real message won't be a tidy little peptide. It's longer than SnapGene shows by default. If the ORF you want isn't appearing, the tool is filtering it out — loosen what counts as an ORF."},
+  {label:"3 · Just tell me the trick.", text:"Drop SnapGene's minimum ORF size until a long open reading frame surfaces (it's 27 residues). Translate it, read the one-letter amino-acid codes straight across. She signed it — in keeping with the menu."}
+];
+const wrap=document.getElementById('hints');let unlocked=1;const open=new Set();
+function render(){wrap.innerHTML="";HINTS.forEach((h,i)=>{
+  const locked=i>=unlocked;const d=document.createElement('div');
+  d.className="hint"+(open.has(i)?" open":"");
+  d.innerHTML=`<button ${locked?"disabled":""}><span class="chev">▸</span><span>${h.label}${locked?" 🔒":""}</span></button><div class="text">${h.text}</div>`;
+  d.querySelector('button').onclick=()=>{open.has(i)?open.delete(i):open.add(i);
+    if(open.has(i)&&i+1>unlocked)unlocked=i+1;render();};
+  wrap.appendChild(d);});}
+render();
+</script></body></html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Departures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DEPARTURES BOARD  ·  classic black & white split-flap
+     No hashing, no build step. The correct flight lives in plain
+     text in the CONFIG block near the bottom of this file.
+     ============================================================ */
+  :root{
+    --board:#0b0b0c;      /* board face */
+    --flap:#161617;       /* individual flap tile */
+    --char:#f4f4f2;       /* off-white characters */
+    --dim:#8a8a86;        /* secondary text */
+    --seam:rgba(0,0,0,.85);
+    --hi:#f4f4f2;         /* boarding highlight (row inverts to this) */
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:transparent;
+    font-family:'Roboto Mono',ui-monospace,monospace;
+    color:var(--char);
+    display:flex;justify-content:center;
+    padding:20px 12px;
+  }
+  .board{
+    width:100%;max-width:760px;
+    background:linear-gradient(180deg,#141416,#0b0b0c 12%,#0b0b0c 88%,#141416);
+    border:1px solid #000;border-radius:8px;
+    box-shadow:0 14px 34px rgba(0,0,0,.55), inset 0 0 0 3px #2a2a2c, inset 0 0 46px rgba(0,0,0,.7);
+    padding:18px 16px 20px;
+  }
+  .marquee{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:2px solid #2a2a2c;padding-bottom:10px;margin-bottom:10px;
+  }
+  .marquee h1{
+    font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:6px;
+    font-size:1.5rem;margin:0;text-transform:uppercase;
+  }
+  .marquee .clock{font-family:'Roboto Mono',monospace;color:var(--dim);font-size:1rem;letter-spacing:1px;}
+
+  /* column grid shared by header + rows */
+  .row{
+    display:grid;
+    grid-template-columns:78px 1fr 74px 52px 118px;
+    gap:6px;align-items:center;
+  }
+  .col-head{
+    font-family:'Oswald',sans-serif;letter-spacing:2px;font-size:.72rem;
+    color:var(--dim);text-transform:uppercase;padding:0 2px 6px;
+  }
+  .col-head.r{text-align:right;}
+
+  .flights{display:flex;flex-direction:column;gap:5px;}
+
+  /* a cell rendered as split-flap tiles */
+  .cell{display:flex;gap:2px;flex-wrap:nowrap;overflow:hidden;}
+  .cell.dest{gap:2px;}
+  .cell.right{justify-content:flex-end;}
+  .tile{
+    background:var(--flap);
+    color:var(--char);
+    font-size:.92rem;font-weight:500;line-height:1;
+    width:15px;height:24px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:2px;
+    position:relative;
+    box-shadow:inset 0 0 0 1px #000;
+  }
+  .tile::after{ /* the horizontal seam of a split-flap */
+    content:"";position:absolute;left:0;right:0;top:50%;height:1px;
+    background:var(--seam);
+  }
+  .status .tile{width:auto;min-width:15px;padding:0 3px;}
+  .status-word{font-family:'Oswald',sans-serif;letter-spacing:1px;}
+
+  .flightrow{
+    padding:5px 4px;border-radius:4px;
+    transition:background .25s ease;
+  }
+  .flightrow .status .tile{color:var(--char);}
+  .flightrow.dimmed .tile{color:var(--dim);}   /* departed / cancelled read dimmer */
+
+  /* the winning row, once boarded, inverts to black-on-white */
+  .flightrow.boarding{background:var(--hi);}
+  .flightrow.boarding .tile{background:#fff;color:#000;box-shadow:inset 0 0 0 1px #ccc;}
+  .flightrow.boarding .tile::after{background:rgba(0,0,0,.25);}
+
+  /* flap flip-in on load */
+  @keyframes flip{
+    0%{transform:rotateX(-90deg);opacity:0;}
+    100%{transform:rotateX(0);opacity:1;}
+  }
+  .tile.anim{animation:flip .28s ease both;transform-origin:top center;}
+
+  /* boarding gate */
+  .gate{
+    margin-top:16px;border-top:2px solid #2a2a2c;padding-top:14px;
+  }
+  .gate label{display:block;font-family:'Oswald',sans-serif;letter-spacing:2px;
+    font-size:.74rem;color:var(--dim);text-transform:uppercase;margin-bottom:7px;}
+  .gate .field{display:flex;gap:8px;}
+  .gate input{
+    flex:1;background:#161617;border:1px solid #333;border-radius:4px;
+    color:var(--char);font-family:'Roboto Mono',monospace;font-size:1rem;
+    letter-spacing:2px;padding:11px 12px;text-transform:uppercase;
+  }
+  .gate input:focus{outline:2px solid var(--char);outline-offset:1px;}
+  .gate button{
+    background:var(--char);color:#000;border:none;border-radius:4px;
+    font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:2px;
+    font-size:.9rem;text-transform:uppercase;padding:0 20px;cursor:pointer;
+  }
+  .gate button:hover{background:#fff;}
+  .gate button:focus-visible{outline:3px solid var(--dim);outline-offset:2px;}
+  .msg{min-height:1.2em;margin-top:10px;font-family:'Roboto Mono',monospace;font-size:.9rem;letter-spacing:1px;}
+  .msg.err{color:#ddd;}
+  @keyframes shake{10%,90%{transform:translateX(-1px);}30%,70%{transform:translateX(3px);}50%{transform:translateX(-3px);}}
+  .shake{animation:shake .4s;}
+
+  /* ---- boarding pass reveal (mono re-theme of the original ticket) ---- */
+  .pass{
+    margin-top:18px;display:none;opacity:0;transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .pass.show{display:block;opacity:1;transform:none;}
+  .ticket{
+    display:grid;grid-template-columns:1fr 128px;
+    background:#f4f4f2;color:#0b0b0c;border-radius:8px;overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.5);
+  }
+  .ticket .main{padding:18px 20px;}
+  .ticket .stub{
+    border-left:3px dashed #0b0b0c;padding:16px 12px;
+    background:repeating-linear-gradient(180deg,#e7e7e3 0 8px,#f4f4f2 8px 16px);
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .ticket .brand{
+    font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:4px;
+    text-transform:uppercase;font-size:.72rem;color:#555;
+    border-bottom:1px solid #cfcfca;padding-bottom:8px;margin-bottom:12px;
+  }
+  .ticket .route{
+    font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:2px;
+    font-size:1.5rem;text-transform:uppercase;margin:0 0 2px;
+  }
+  .ticket .kwrap{display:flex;gap:22px;flex-wrap:wrap;margin:14px 0 4px;}
+  .ticket .k{font-family:'Oswald',sans-serif;font-size:.62rem;letter-spacing:2px;
+    text-transform:uppercase;color:#666;}
+  .ticket .v{font-family:'Roboto Mono',monospace;font-weight:700;font-size:1rem;color:#0b0b0c;}
+  .ticket .barcode{height:42px;margin-top:14px;
+    background:repeating-linear-gradient(90deg,#0b0b0c 0 2px,transparent 2px 4px,#0b0b0c 4px 5px,transparent 5px 9px);}
+  .ticket .stub .code{font-family:'Roboto Mono',monospace;font-size:.7rem;
+    writing-mode:vertical-rl;letter-spacing:3px;align-self:center;color:#555;}
+  .ticket .stub .seatbig{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.3rem;text-align:center;}
+  .reveal-note{margin:14px 2px 0;}
+  .reveal-note p{font-family:Georgia,serif;line-height:1.55;font-size:1.02rem;color:var(--char);margin:0 0 8px;}
+  .gate-link{
+    display:inline-block;margin-top:6px;background:var(--char);color:#0b0b0c;text-decoration:none;
+    font-family:'Oswald',sans-serif;letter-spacing:2px;text-transform:uppercase;font-size:.82rem;
+    padding:10px 20px;border-radius:4px;
+  }
+  .gate-link:hover{background:#fff;}
+
+  @media (max-width:560px){
+    .row{grid-template-columns:64px 1fr 60px 40px 96px;}
+    .tile{width:13px;height:22px;font-size:.8rem;}
+    .marquee h1{font-size:1.1rem;letter-spacing:3px;}
+    .ticket{grid-template-columns:1fr 96px;}
+    .ticket .route{font-size:1.2rem;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .tile.anim{animation:none;} .shake{animation:none;}
+    .flightrow{transition:none;} .pass{transition:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="board" role="region" aria-label="Flight departures board">
+    <div class="marquee">
+      <h1>Departures</h1>
+      <span class="clock" id="clock">--:--</span>
+    </div>
+    <div class="row col-heads">
+      <span class="col-head">Flight</span>
+      <span class="col-head">Destination</span>
+      <span class="col-head r">Departs</span>
+      <span class="col-head r">Gate</span>
+      <span class="col-head">Status</span>
+    </div>
+    <div class="flights" id="flights"></div>
+
+    <div class="gate">
+      <label for="flightInput" id="gateLabel">Which flight are you boarding? Enter the flight number.</label>
+      <div class="field">
+        <input id="flightInput" type="text" autocomplete="off" spellcheck="false"
+               placeholder="e.g. QF 419" aria-describedby="msg">
+        <button id="boardBtn" type="button">Board</button>
+      </div>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+      <div class="pass" id="pass">
+        <div class="ticket">
+          <div class="main">
+            <div class="brand" id="passBrand">Boarding Pass</div>
+            <div class="route" id="passRoute">— &#9992; —</div>
+            <div class="kwrap">
+              <div><div class="k">Passenger</div><div class="v" id="passName">—</div></div>
+              <div><div class="k">Flight</div><div class="v" id="passFlight">—</div></div>
+              <div><div class="k">Gate</div><div class="v" id="passGate">—</div></div>
+              <div><div class="k">Seat</div><div class="v" id="passSeat">—</div></div>
+            </div>
+            <div class="barcode"></div>
+          </div>
+          <div class="stub">
+            <span class="code" id="passStub">BOARDING PASS</span>
+            <span class="seatbig" id="passSeatBig">—</span>
+          </div>
+        </div>
+        <div class="reveal-note" id="revealNote"></div>
+        <a class="gate-link" id="gateLink" href="#" style="display:none">Proceed to gate</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ================================================================
+   ▼▼▼  EDIT EVERYTHING BELOW — this is the only part you touch  ▼▼▼
+   ================================================================ */
+const CONFIG = {
+  // What the sign at the top asks.
+  prompt: "Which flight are you boarding? Enter the flight number.",
+
+  // THE ANSWER — plain text, no hashing.
+  // She can type ANY of these (case/space-insensitive) and it counts as correct.
+  // Put the flight number and/or the destination here — whatever your clue points to.
+  answer: ["NH 806", "Tokyo"],
+
+  // The boarding pass shown once she boards the right flight.
+  // Flight / Gate / Destination auto-fill from the row she picked;
+  // you just set the passenger, seat, origin, note and (optional) link.
+  reveal: {
+    passenger: "A. LEE",
+    seat:      "28F",
+    origin:    "SYDNEY",        // shown as  ORIGIN  &#9992;  DESTINATION  on the pass
+    lines: [
+      "You made the flight with minutes to spare.",
+      "Who said an apple a day could keep this Dr. away?"
+    ],
+    linkText: "Proceed to gate",
+    linkUrl:  "https://app.notion.com/p/Tokyo-airport-397fc3fda6d580f69fb8fdac0650363d?source=copy_link"                // e.g. "" — leave "" to hide
+  },
+
+  // The flights shown on the board. Add/remove/reorder freely.
+  // status options: "ON TIME", "BOARDING", "FINAL CALL", "DELAYED",
+  //                 "DEPARTED", "CANCELLED", "GATE CLOSED", "SCHEDULED"
+  // Make the RIGHT flight look ordinary (e.g. "ON TIME"); her clue tells her which one.
+  flights: [
+    { no:"BA 208", dest:"LONDON",       time:"06:15", gate:"12", status:"DEPARTED"   },
+    { no:"AF 447", dest:"PARIS",        time:"06:40", gate:"09", status:"DEPARTED"   },
+    { no:"LH 761", dest:"FRANKFURT",    time:"07:05", gate:"22", status:"GATE CLOSED"},
+    { no:"EK 355", dest:"DUBAI",        time:"07:30", gate:"04", status:"BOARDING"   },
+    { no:"SQ 232", dest:"SINGAPORE",    time:"07:55", gate:"17", status:"ON TIME"    },
+    { no:"QF 419", dest:"CAIRO",        time:"08:10", gate:"14", status:"ON TIME"    },
+    { no:"DL 118", dest:"NEW YORK",     time:"08:25", gate:"31", status:"DELAYED"    },
+    { no:"NH 806", dest:"TOKYO",        time:"08:40", gate:"98", status:"ON TIME"    },
+    { no:"AZ 610", dest:"ROME",         time:"09:00", gate:"11", status:"FINAL CALL" },
+    { no:"IB 342", dest:"MADRID",       time:"09:20", gate:"06", status:"ON TIME"    },
+    { no:"TK 128", dest:"ISTANBUL",     time:"09:45", gate:"19", status:"DELAYED"    },
+    { no:"KL 705", dest:"BRUSSELS",     time:"10:05", gate:"08", status:"ON TIME"    },
+    { no:"CX 138", dest:"HONG KONG",    time:"10:25", gate:"25", status:"CANCELLED"  },
+    { no:"UA 902", dest:"CHENGDU",      time:"10:50", gate:"33", status:"SCHEDULED"  },
+    { no:"AC 856", dest:"ANKARA",       time:"11:10", gate:"15", status:"ON TIME"    },
+    ]
+};
+/* ================================================================
+   ▲▲▲  STOP EDITING HERE — the machinery below just runs it  ▲▲▲
+   ================================================================ */
+
+(function(){
+  const norm = s => String(s).toUpperCase().trim().replace(/\s+/g,' ');
+  const answers = (Array.isArray(CONFIG.answer) ? CONFIG.answer : [CONFIG.answer]).map(norm);
+  const dimStatuses = new Set(["DEPARTED","CANCELLED","GATE CLOSED"]);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.getElementById('gateLabel').textContent = CONFIG.prompt;
+
+  // live clock
+  function tick(){
+    const d = new Date();
+    const p = n => String(n).padStart(2,'0');
+    document.getElementById('clock').textContent = p(d.getHours())+':'+p(d.getMinutes());
+  }
+  tick(); setInterval(tick, 15000);
+
+  // build a split-flap cell out of individual character tiles
+  let flapCount = 0;
+  function cell(text, extraClass){
+    const c = document.createElement('div');
+    c.className = 'cell ' + (extraClass||'');
+    [...String(text)].forEach(ch => {
+      const t = document.createElement('span');
+      t.className = 'tile' + (reduce ? '' : ' anim');
+      if(!reduce) t.style.animationDelay = (flapCount++ * 0.012) + 's';
+      t.textContent = ch === ' ' ? '\u00A0' : ch;
+      c.appendChild(t);
+    });
+    return c;
+  }
+  function statusCell(word){
+    const c = document.createElement('div');
+    c.className = 'cell status';
+    const t = document.createElement('span');
+    t.className = 'tile' + (reduce ? '' : ' anim');
+    if(!reduce) t.style.animationDelay = (flapCount++ * 0.012) + 's';
+    const w = document.createElement('span');
+    w.className = 'status-word'; w.textContent = word;
+    t.appendChild(w);
+    c.appendChild(t);
+    return c;
+  }
+
+  const container = document.getElementById('flights');
+  const rowEls = [];
+  CONFIG.flights.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'row flightrow' + (dimStatuses.has(f.status) ? ' dimmed' : '');
+    row.dataset.no = norm(f.no);
+    row.dataset.dest = norm(f.dest);
+    row.dataset.gate = f.gate;
+    row.dataset.time = f.time;
+    row.dataset.destRaw = f.dest;
+    row.dataset.noRaw = f.no;
+    row.appendChild(cell(f.no));
+    row.appendChild(cell(f.dest, 'dest'));
+    row.appendChild(cell(f.time, 'right'));
+    row.appendChild(cell(f.gate, 'right'));
+    row.appendChild(statusCell(f.status));
+    container.appendChild(row);
+    rowEls.push(row);
+  });
+
+  const input = document.getElementById('flightInput');
+  const msg = document.getElementById('msg');
+  const pass = document.getElementById('pass');
+  input.placeholder = 'e.g. ' + (CONFIG.flights[5] ? CONFIG.flights[5].no : 'QF 419');
+
+  function flipStatusTo(row, word){
+    const statusCellEl = row.querySelector('.status');
+    statusCellEl.innerHTML = '';
+    const t = document.createElement('span');
+    t.className = 'tile' + (reduce ? '' : ' anim');
+    const w = document.createElement('span');
+    w.className = 'status-word'; w.textContent = word;
+    t.appendChild(w); statusCellEl.appendChild(t);
+  }
+
+  function showPass(row){
+    const r = CONFIG.reveal;
+    const dest = row.dataset.destRaw;
+    document.getElementById('passRoute').innerHTML =
+      esc(r.origin) + ' &#9992; ' + esc(dest);
+    document.getElementById('passName').textContent = r.passenger;
+    document.getElementById('passFlight').textContent = row.dataset.noRaw;
+    document.getElementById('passGate').textContent = row.dataset.gate;
+    document.getElementById('passSeat').textContent = r.seat;
+    document.getElementById('passSeatBig').textContent = r.seat;
+    document.getElementById('passStub').textContent = row.dataset.noRaw + ' \u00B7 ' + dest.toUpperCase();
+
+    const note = document.getElementById('revealNote');
+    note.innerHTML = '';
+    (r.lines||[]).forEach(line => {
+      const p = document.createElement('p'); p.textContent = line; note.appendChild(p);
+    });
+    const link = document.getElementById('gateLink');
+    if(r.linkUrl){
+      link.href = r.linkUrl; link.target = '_top'; link.rel = 'noopener';
+      link.textContent = r.linkText || 'Continue';
+      link.style.display = 'inline-block';
+    }
+    pass.classList.add('show');
+    pass.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'nearest'});
+  }
+
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+  function board(){
+    const val = norm(input.value);
+    if(!val){ return; }
+    const match = answers.includes(val);
+    if(match){
+      let row = rowEls.find(r => r.dataset.no === val || r.dataset.dest === val);
+      if(!row) row = rowEls.find(r => answers.includes(r.dataset.no) || answers.includes(r.dataset.dest));
+      if(row){
+        row.classList.remove('dimmed');
+        row.classList.add('boarding');
+        flipStatusTo(row, 'NOW BOARDING');
+        showPass(row);
+      }
+      msg.textContent = '\u2713 Boarding confirmed.';
+      msg.className = 'msg';
+      input.disabled = true; document.getElementById('boardBtn').disabled = true;
+    } else {
+      msg.textContent = '\u2717 No such boarding call. Check the board and try again.';
+      msg.className = 'msg err';
+      if(!reduce){ input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake'); }
+    }
+  }
+
+  document.getElementById('boardBtn').addEventListener('click', board);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') board(); });
+})();
+</script>
+</body>
+</html>

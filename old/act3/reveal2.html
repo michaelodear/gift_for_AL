@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Truth</title><link rel="stylesheet" href="act3.css">
+<style>
+body{padding:0;display:block;background:#0e0b08}
+.wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+video{max-width:100%;max-height:100%}
+.gate{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% 0%,#f3ead6,#dcc8a2);gap:18px;text-align:center;padding:24px}
+.gate h1{color:var(--brick);margin:0}
+.gate .tag{letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--wood)}
+.done{position:fixed;inset:auto 0 40px 0;display:none;justify-content:center}
+.done.show{display:flex}
+</style></head><body>
+<div class="gate" id="gate">
+  <div class="tag">Case 0507 · Scene</div>
+  <h1>The Truth</h1>
+  <button class="cont" id="play">▶ Play this scene</button>
+  <div class="note" style="max-width:420px">Best with sound on. If it won't play, the MP4 named
+    <b>reveal2.mp4</b> isn't in this folder yet — export it from the objection.lol Maker.</div>
+</div>
+<div class="wrap" style="display:none" id="stage">
+  <video id="v" src="reveal2.mp4" playsinline></video>
+</div>
+<div class="done" id="done"><a class="cont" href="clip4.html">Continue →</a></div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('reveal2.html');
+var v=document.getElementById('v');
+document.getElementById('play').onclick=function(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('stage').style.display='flex';
+  v.play();
+};
+v.addEventListener('ended',function(){document.getElementById('done').classList.add('show');});
+v.addEventListener('error',function(){document.getElementById('done').classList.add('show');});
+</script></body></html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suspect Dossiers</title><link rel="stylesheet" href="act3.css"></head><body>
+<div class="frame">
+ <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Who built the forgery?</header>
+ <div class="stage">
+  <h1>Three people, one forged read</h1>
+  <p class="sub">If the trace was <i>built</i>, it was built from someone's real DNA. Here are the three with any reason to want you framed. Download each read, open it over the forgery in SnapGene, and see whose profile is hiding underneath.</p>
+  <div class="wall" id="wall"></div>
+  <p style="margin:6px 0 0"><a class="dl alt" href="evidence_trace.ab1" download>⬇ evidence_trace.ab1</a>
+   &nbsp;<a class="dl alt" href="reference.dna" download>⬇ reference.dna</a></p>
+  <p class="sub" style="margin:22px 0 8px"><b>Only one comes back a match. Who's your forger?</b></p>
+  <div class="choices" id="who"></div>
+  <div class="verdict" id="msg"></div>
+  <a class="cont" id="next" href="reveal1b.html" style="display:none">Take it to the court →</a>
+  <div class="note">Take your time — do the alignment in SnapGene, then come back (or reopen the start page and pick <b>Resume</b>). Your place is saved.</div>
+ </div>
+</div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('panel_dossiers.html');
+var S=[
+ {name:"seek.com",role:"The Literal Devil",img:"seek.png",motive:"Crime pays when the jobs don't. Every rejection, another motive.",ab1:"seek_com.ab1"},
+ {name:"The Surgeon",role:"The Unethical Human",img:"flaky_ghost.jpg",motive:"Never replies, never records. Leaving no trace is the whole trick.",ab1:"the_surgeon.ab1"},
+ {name:"Xanthea Yee",role:"The Doppelgänger",img:"xanthea_yee.png",motive:"Same face, meaner spelling — the Waluigi to your Luigi.",ab1:"xanthea_yee.ab1"}
+];
+var wall=document.getElementById('wall'),who=document.getElementById('who'),
+    msg=document.getElementById('msg'),next=document.getElementById('next');
+S.forEach(function(s){var d=document.createElement('div');d.className='folder';
+ d.innerHTML='<div class="icon"><img src="'+s.img+'" alt=""></div><div class="name">'+s.name+
+  '</div><div class="role">'+s.role+'</div><div class="motive">'+s.motive+
+  '</div><a class="dl" href="'+s.ab1+'" download>⬇ '+s.ab1+'</a>';
+ wall.appendChild(d);});
+S.forEach(function(s){var b=document.createElement('button');b.className='choice';b.textContent=s.name;
+ b.onclick=function(){
+   if(s.name==="Xanthea Yee"){b.classList.add('right');msg.className='verdict ok';
+     msg.textContent="Her trace comes back near-perfect. Every base but a handful. That's your match.";
+     next.style.display='inline-block';[].forEach.call(who.children,function(x){x.disabled=true;});}
+   else{b.classList.add('wrong');msg.className='verdict err';
+     msg.textContent = s.name==="The Surgeon" ? "The surgeon's read failed — nothing to align. A dead end." :
+       "seek.com lines up, but for three clean gaps where the jobs should be. Not your forger.";
+     setTimeout(function(){b.classList.remove('wrong');},400);}
+ };
+ who.appendChild(b);});
+</script></body></html>

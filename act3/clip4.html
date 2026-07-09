@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdict</title><link rel="stylesheet" href="act3.css">
+<style>
+body{padding:0;display:block;background:#070b0f}
+.wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+video{max-width:100%;max-height:100%}
+.gate{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:24px;
+ background:radial-gradient(120% 120% at 50% -10%,#12202c,#0a1017)}
+.gate .tag{font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;font-size:11px;color:var(--dim)}
+.gate h1{margin:0;color:#eef4f8;font-size:30px}
+.done{position:fixed;inset:auto 0 40px 0;display:none;justify-content:center}
+.done.show{display:flex}
+</style></head><body>
+<div class="gate" id="gate">
+  <div class="tag">Case 0507 // Exhibit</div>
+  <h1>Verdict</h1>
+  <button class="cont" id="play">▶ Play</button>
+</div>
+<div class="wrap" style="display:none" id="stage"><video id="v" src="clip4.mp4" playsinline></video></div>
+<div class="done" id="done"><a class="cont" href="closer.html">Continue →</a></div>
+<script src="act3.js"></script>
+<script>
+if(window.Act3) Act3.mark('clip4.html');
+var v=document.getElementById('v');
+document.getElementById('play').onclick=function(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('stage').style.display='flex'; v.play(); };
+function fin(){document.getElementById('done').classList.add('show');}
+v.addEventListener('ended',fin); v.addEventListener('error',fin);
+</script></body></html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Was She Hiding?</title><link rel="stylesheet" href="act3.css"></head><body>
+<div class="frame">
+ <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; One last look</header>
+ <div class="stage">
+  <h1>What was she hiding?</h1>
+  <p class="sub">A near-match isn't proof. Xanthea's trace looks like the forgery — but it's her own real DNA, and it fits the reference <i>worse</i> than the fake fits you. There's no honest reason it's the forger's and not just an unlucky lookalike's. You have nothing that clears you. So you do the only thing left: load her sequence in raw, and pray she hid something she shouldn't have.</p>
+  <p style="margin:0 0 6px"><a class="dl" href="xanthea.dna" download>⬇ xanthea.dna</a></p>
+  <p style="margin:20px 0 6px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--amber);text-transform:uppercase">Detective's Notebook</p>
+  <div id="hints"></div>
+  <div id="lastword" style="display:none;margin-top:26px">
+   <p class="sub" style="margin-bottom:10px"><b>There it is</b> — hidden in the doppelgänger's own sequence, in her own hand. The whole court is watching, and you have one statement left to clear your name. So: what do you say?</p>
+   <input type="text" id="ans" placeholder="type it exactly as it reads" autocomplete="off">
+   <div class="verdict err" id="msg" style="margin-top:10px"></div>
+   <a class="cont" id="say">Say it →</a>
+  </div>
+  <div class="note">Go do it in SnapGene, then come back (or Resume from the start page). Your place is saved.</div>
+ </div>
+</div>
+<script src="act3.js"></script>
+<script>
+Act3.mark('panel_decode.html');
+var HINTS=[
+ {q:"Where do I start?",a:"Does anything look <i>different</i> in the annotations of the two DNA files? Put them side by side."},
+ {q:"I see it — now what?",a:"The DNA itself is a distraction. Stop comparing bases. There's another code in here worth paying attention to."},
+ {q:"Still stuck.",a:"That reading frame the translation's showing you now — read it across as protein. Wait... does that ORF spell a <i>message</i>?"}
+];
+var wrap=document.getElementById('hints'),unlocked=1,open={};
+function render(){wrap.innerHTML="";HINTS.forEach(function(h,i){
+  var locked=i>=unlocked;var d=document.createElement('div');
+  d.className="hint"+(open[i]?" open":"");
+  d.innerHTML='<button '+(locked?'disabled':'')+'><span class="chev">▸</span><span>'+(i+1)+' · '+h.q+(locked?' 🔒':'')+'</span></button><div class="text">'+h.a+'</div>';
+  d.querySelector('button').onclick=function(){open[i]=!open[i]; if(open[i]&&i+1>unlocked)unlocked=i+1; render();};
+  wrap.appendChild(d);});
+  document.getElementById('lastword').style.display = unlocked>=HINTS.length || Object.keys(open).length ? 'block':'block';
+}
+render();
+var TARGET="MWAHAHAHAITSAMEIMTHEIMPASTA";
+function norm(s){return (s||"").toUpperCase().replace(/[^A-Z]/g,"");}
+var ans=document.getElementById('ans'),msg=document.getElementById('msg');
+document.getElementById('say').onclick=function(){
+  if(norm(ans.value)===TARGET){msg.className='verdict ok';msg.textContent="...";
+    setTimeout(function(){Act3.mark('reveal2.html');location.href='reveal2.html';},500);}
+  else{msg.className='verdict err';msg.textContent="That's not what she wrote. Read it back to them exactly.";}
+};
+ans.addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('say').click();});
+</script></body></html>
