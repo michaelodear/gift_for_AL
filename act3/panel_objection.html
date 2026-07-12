@@ -1,36 +1,80 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Examine the Evidence</title><link rel="stylesheet" href="act3.css"></head><body>
+<title>The Evidence</title><link rel="stylesheet" href="act3.css">
+<style>
+/* exhibit card â€” self-contained so act3.css needs no changes */
+.exhibit{border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  background:var(--panel2);margin:4px 0 26px;position:relative}
+.exhibit-head{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;background:var(--bg1);border-bottom:1px solid var(--line)}
+.exh-label{font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--dim)}
+.exh-stamp{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--red);border:2px solid var(--red);
+  border-radius:4px;padding:3px 9px;transform:rotate(-3deg);opacity:.9}
+.exhibit-body{padding:16px 18px 18px}
+.exh-title{font-size:17px;color:#eef4f8;font-weight:650;margin-bottom:5px}
+.exh-meta{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:14px}
+.exh-meta b{color:var(--text)}
+</style></head><body>
 <div class="frame">
-  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;·&nbsp; Recess — examine the evidence</header>
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;Â·&nbsp; Recess â€” examine the evidence</header>
   <div class="stage">
-    <h1>One clean profile</h1>
-    <p class="sub">You've opened the container's DNA read in SnapGene. The prosecution's whole case rests on it.
-      Look at it again — really look. <b>What's wrong with this trace?</b></p>
+
+    <h1>The Evidence</h1>
+    <p class="sub">The prosecution's case rests on a single trace, recovered at the scene and matched to you.
+      Aligned against the reference, it is a flawless match â€” every base, end to end. Not one mismatch.
+      That, they insist, is that.<br><br>
+      Align it yourself. Then look at the trace properly â€” and tell the court what's wrong with it.</p>
+
+    <div class="exhibit">
+      <div class="exhibit-head">
+        <span class="exh-label">Prosecution Evidence // P-1</span>
+        <span class="exh-stamp">Conclusive Match</span>
+      </div>
+      <div class="exhibit-body">
+        <div class="exh-title">Sydney scene â€” DNA read</div>
+        <div class="exh-meta">
+          Case 0507 Â· recovered at the scene of the seventh murder<br>
+          Sole physical evidence Â· <b>100% identity to the defendant â€” 0 mismatches</b>
+        </div>
+        <a class="dl" href="evidence_trace.ab1" download>â¬‡ evidence_trace.ab1</a>
+        &nbsp;<a class="dl alt" href="reference.gb" download>â¬‡ reference.gb</a>
+      </div>
+    </div>
+
     <div class="choices" id="choices"></div>
     <div class="verdict" id="verdict"></div>
-    <a class="cont" id="next" href="clip2.html" style="display:none">Raise the objection →</a>
+    <a class="cont" id="next" href="clip2.html" style="display:none">Raise the objection â†’</a>
+
+    <div class="note">Open it in SnapGene and take a proper look, then come back.
+      <a href="../index.html" style="color:var(--amber)">Save &amp; exit to the trial hub â†’</a>
+      Your place is saved; bookmark the hub to pick up here anytime.</div>
   </div>
 </div>
 <script src="act3.js"></script>
 <script>
-Act3.mark('panel_objection.html');
-/* ---- EDIT: the choices. correct:true on the real answer. ---- */
+if(window.Act3) Act3.mark('panel_objection.html');
+/* EDIT: the choices. ok:true on the real answer. */
 const CHOICES=[
-  {t:"It's clean through the middle of the read.", ok:false, no:"Not quite — the middle of a real read is usually its best part."},
-  {t:"The peak heights rise and fall across the read.", ok:false, no:"Not quite — that's normal. Real peaks breathe."},
+  {t:"It's clean through the middle of the read.", ok:false, no:"Not quite â€” the middle of a real read is usually its best part."},
+  {t:"The peak heights rise and fall across the read.", ok:false, no:"Not quite â€” that's normal. Real peaks breathe."},
   {t:"It's clean right to both edges.", ok:true},
-  {t:"There's faint baseline noise between the peaks.", ok:false, no:"Not quite — a little baseline noise is what you'd expect."}
+  {t:"There's faint baseline noise between the peaks.", ok:false, no:"Not quite â€” a little baseline noise is exactly what you'd expect."}
 ];
 const box=document.getElementById('choices'),v=document.getElementById('verdict'),next=document.getElementById('next');
 CHOICES.forEach(c=>{
   const b=document.createElement('button');b.className='choice';b.textContent=c.t;
   b.onclick=()=>{
-    if(c.ok){b.classList.add('right');v.className='verdict ok';
-      v.textContent="Exactly. A real read is a mess at both ends — this one is flawless corner to corner. Nobody recovered this. Somebody built it.";
-      next.style.display='inline-block';[...box.children].forEach(x=>x.disabled=true);}
-    else{b.classList.add('wrong');v.className='verdict err';v.textContent=c.no;
-      setTimeout(()=>b.classList.remove('wrong'),400);}
+    if(c.ok){
+      b.classList.add('right'); v.className='verdict ok';
+      v.textContent="Exactly. A real read is a mess at both ends â€” this one is flawless corner to corner. Nobody recovered this. Somebody built it.";
+      next.style.display='inline-block';
+      [...box.children].forEach(x=>x.disabled=true);
+    } else {
+      b.classList.add('wrong'); v.className='verdict err'; v.textContent=c.no;
+      setTimeout(()=>b.classList.remove('wrong'),400);
+    }
   };
   box.appendChild(b);
 });
