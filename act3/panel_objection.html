@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Evidence</title><link rel="stylesheet" href="act3.css">
 <style>
-/* exhibit card â€” self-contained so act3.css needs no changes */
+/* exhibit card &mdash; self-contained so act3.css needs no changes */
 .exhibit{border:1px solid var(--line);border-radius:8px;overflow:hidden;
   background:var(--panel2);margin:4px 0 26px;position:relative}
 .exhibit-head{display:flex;align-items:center;justify-content:space-between;
@@ -18,14 +18,14 @@
 .exh-meta b{color:var(--text)}
 </style></head><body>
 <div class="frame">
-  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;Â·&nbsp; Recess â€” examine the evidence</header>
+  <header class="tab"><span class="dot"></span><b>Case 0507</b> &nbsp;&middot;&nbsp; Recess &mdash; examine the evidence</header>
   <div class="stage">
 
     <h1>The Evidence</h1>
     <p class="sub">The prosecution's case rests on a single trace, recovered at the scene and matched to you.
-      Aligned against the reference, it is a flawless match â€” every base, end to end. Not one mismatch.
+      Aligned against the reference, it is a flawless match &mdash; every base, end to end. Not one mismatch.
       That, they insist, is that.<br><br>
-      Align it yourself. Then look at the trace properly â€” and tell the court what's wrong with it.</p>
+      Align it yourself. Then look at the trace properly &mdash; and tell the court what's wrong with it.</p>
 
     <div class="exhibit">
       <div class="exhibit-head">
@@ -33,22 +33,22 @@
         <span class="exh-stamp">Conclusive Match</span>
       </div>
       <div class="exhibit-body">
-        <div class="exh-title">Sydney scene â€” DNA read</div>
+        <div class="exh-title">Sydney scene &mdash; DNA read</div>
         <div class="exh-meta">
-          Case 0507 Â· recovered at the scene of the seventh murder<br>
-          Sole physical evidence Â· <b>100% identity to the defendant â€” 0 mismatches</b>
+          Case 0507 &middot; recovered at the scene of the seventh murder<br>
+          Sole physical evidence &middot; <b>100% identity to the defendant &mdash; 0 mismatches</b>
         </div>
-        <a class="dl" href="evidence_trace.ab1" download>â¬‡ evidence_trace.ab1</a>
-        &nbsp;<a class="dl alt" href="reference.gb" download>â¬‡ reference.gb</a>
+        <a class="dl" href="evidence_trace.ab1" download>&#8681; evidence_trace.ab1</a>
+        &nbsp;<a class="dl alt" href="reference.gb" download>&#8681; reference.gb</a>
       </div>
     </div>
 
     <div class="choices" id="choices"></div>
     <div class="verdict" id="verdict"></div>
-    <a class="cont" id="next" href="clip2.html" style="display:none">Raise the objection â†’</a>
+    <a class="cont" id="next" href="clip2.html" style="display:none">Raise the objection &rarr;</a>
 
     <div class="note">Open it in SnapGene and take a proper look, then come back.
-      <a href="../index.html" style="color:var(--amber)">Save &amp; exit to the trial hub â†’</a>
+      <a href="../index.html" style="color:var(--amber)">Save &amp; exit to the trial hub &rarr;</a>
       Your place is saved; bookmark the hub to pick up here anytime.</div>
   </div>
 </div>
@@ -57,10 +57,10 @@
 if(window.Act3) Act3.mark('panel_objection.html');
 /* EDIT: the choices. ok:true on the real answer. */
 const CHOICES=[
-  {t:"It's clean through the middle of the read.", ok:false, no:"Not quite â€” the middle of a real read is usually its best part."},
-  {t:"The peak heights rise and fall across the read.", ok:false, no:"Not quite â€” that's normal. Real peaks breathe."},
+  {t:"It's clean through the middle of the read.", ok:false, no:"Not quite &mdash; the middle of a real read is usually its best part."},
+  {t:"The peak heights rise and fall across the read.", ok:false, no:"Not quite &mdash; that's normal. Real peaks breathe."},
   {t:"It's clean right to both edges.", ok:true},
-  {t:"There's faint baseline noise between the peaks.", ok:false, no:"Not quite â€” a little baseline noise is exactly what you'd expect."}
+  {t:"There's faint baseline noise between the peaks.", ok:false, no:"Not quite &mdash; a little baseline noise is exactly what you'd expect."}
 ];
 const box=document.getElementById('choices'),v=document.getElementById('verdict'),next=document.getElementById('next');
 CHOICES.forEach(c=>{
@@ -68,7 +68,7 @@ CHOICES.forEach(c=>{
   b.onclick=()=>{
     if(c.ok){
       b.classList.add('right'); v.className='verdict ok';
-      v.textContent="Exactly. A real read is a mess at both ends â€” this one is flawless corner to corner. Nobody recovered this. Somebody built it.";
+      v.textContent="Exactly. A real read is a mess at both ends &mdash; this one is flawless corner to corner. Nobody recovered this. Somebody built it.";
       next.style.display='inline-block';
       [...box.children].forEach(x=>x.disabled=true);
     } else {
